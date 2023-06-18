@@ -75,7 +75,7 @@ switch($command) {
         setup -Object $object -Version $version
     }
     "build" {
-        build -Platform = $args[1]
+        build -Platform $args[1]
     }
     "install" {
         if (Get-Command git -errorAction SilentlyContinue) {
