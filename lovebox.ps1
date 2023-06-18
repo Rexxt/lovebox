@@ -56,13 +56,32 @@ function build {
     param (
         $Platform
     )
+    Remove-Item 'game.love'
     Compress-Archive -Path '.' -DestinationPath 'game.zip'
     Rename-Item 'game.zip' 'game.love'
 
     switch($Platform) {
-        "universal" {}
+        "universal" {
+            Write-Host("Build ready!")
+        }
         default {
             Write-Host("Platform unknown, build manually from here.")
+        }
+    }
+}
+
+function debug {
+    param (
+        $Platform
+    )
+    switch($Platform) {
+        "pc" {
+            love .
+        }
+        "android" {
+            build -Platform "universal"
+            .\adb.exe push game.love /sdcard/lovebox/game.love
+            .\adb.exe shell am start -S -n "org.love2d.android/.GameActivity" -d "file:///sdcard/lovebox/game.love"
         }
     }
 }
@@ -88,7 +107,7 @@ switch($command) {
 
     }
     "debug" {
-
+        debug -Platform $args[1]
     }
     default {
         Write-Host("Usage: $PSCommandPath <setup/build/install/remove/debug> [parameters]")
