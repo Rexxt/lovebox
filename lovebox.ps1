@@ -98,6 +98,30 @@ function debug {
     }
 }
 
+function packages {
+    param (
+        $Action,
+        $Package
+    )
+
+    $RepoURL = "https://raw.githubusercontent.com/Rexxt/lovebox-packages/main/packages.json"
+    $Repos = Invoke-WebRequest $RepoURL -UseBasicParsing | ConvertFrom-Json -AsHashtable
+    if (Get-Command git -errorAction SilentlyContinue) {
+        if($Repos.ContainsKey($Package)) {
+            Write-Host("Installing $Package from", $Repos[$Package].url)
+            if($Repos[$Package].origin -eq 'git') {
+                git pull --rebase $Repos[$Package].url
+            } else {
+                Write-Host('Origin error.')
+            }
+        } else {
+            Write-Host("Unknown package.")
+        }
+    } else {
+        Write-Host("Installing git is required!")
+    }
+}
+
 $command = $args[0]
 switch($command) {
     "setup" {
@@ -109,14 +133,10 @@ switch($command) {
         build -Platform $args[1]
     }
     "install" {
-        if (Get-Command git -errorAction SilentlyContinue) {
-            Write-Host "can use git"
-        } else {
-            Write-Host("Installing git is required!")
-        }
+        packages -Action install -Package $args[1]
     }
     "remove" {
-
+        
     }
     "debug" {
         debug -Platform $args[1]
