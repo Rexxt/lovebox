@@ -30,8 +30,8 @@ function setup {
     )
     switch($Object) {
         "love-android" {
-            Invoke-WebRequest -Uri "https://github.com/love2d/love/releases/download/$version/love-$Version-android.apk" -OutFile 'org.love2d.android.apk'
             local
+            Invoke-WebRequest -Uri "https://github.com/love2d/love/releases/download/$version/love-$Version-android.apk" -OutFile 'org.love2d.android.apk'
             .\adb.exe install 'org.love2d.android.apk'
             returnfromlocal
         }
