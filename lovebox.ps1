@@ -110,7 +110,7 @@ function packages {
         if($Repos.ContainsKey($Package)) {
             Write-Host("Installing $Package from", $Repos[$Package].url)
             if($Repos[$Package].origin -eq 'git') {
-                git pull --rebase $Repos[$Package].url
+                git clone $Repos[$Package].url
             } else {
                 Write-Host('Origin error.')
             }
@@ -136,7 +136,7 @@ switch($command) {
         packages -Action install -Package $args[1]
     }
     "remove" {
-        
+
     }
     "debug" {
         debug -Platform $args[1]
