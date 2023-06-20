@@ -16,6 +16,13 @@
 #   pc: start debugging the game on your computer
 #   android: start debugging the game on your connected ADB-enabled device
 
+function local {
+    Push-Location $PSScriptRoot
+}
+function returnfromlocal {
+    Pop-Location
+}
+
 function setup {
     param (
         $Object,
@@ -24,7 +31,9 @@ function setup {
     switch($Object) {
         "love-android" {
             Invoke-WebRequest -Uri "https://github.com/love2d/love/releases/download/$version/love-$Version-android.apk" -OutFile 'org.love2d.android.apk'
+            local
             .\adb.exe install 'org.love2d.android.apk'
+            returnfromlocal
         }
         "project" {
             Set-Content 'main.lua' '-- generated using lovebox'
@@ -57,7 +66,7 @@ function build {
         $Platform
     )
     Remove-Item 'game.love'
-    Compress-Archive -Path '.' -DestinationPath 'game.zip'
+    Compress-Archive -Path '*' -DestinationPath 'game.zip'
     Rename-Item 'game.zip' 'game.love'
 
     switch($Platform) {
@@ -80,8 +89,11 @@ function debug {
         }
         "android" {
             build -Platform "universal"
-            .\adb.exe push game.love /sdcard/lovebox/game.love
+            $GameDir = $pwd
+            local
+            .\adb.exe push $GameDir\game.love /sdcard/lovebox/game.love
             .\adb.exe shell am start -S -n "org.love2d.android/.GameActivity" -d "file:///sdcard/lovebox/game.love"
+            returnfromlocal
         }
     }
 }
