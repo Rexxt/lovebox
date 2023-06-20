@@ -90,10 +90,21 @@ function debug {
         "android" {
             build -Platform "universal"
             $GameDir = $pwd
-            local
-            .\adb.exe push $GameDir\game.love /sdcard/lovebox/game.love
-            .\adb.exe shell am start -S -n "org.love2d.android/.GameActivity" -d "file:///sdcard/lovebox/game.love"
-            returnfromlocal
+            try
+            {
+                local
+                .\adb.exe push $GameDir\game.love /sdcard/lovebox/game.love
+                .\adb.exe shell am start -S -n "org.love2d.android/.GameActivity" -d "file:///sdcard/lovebox/game.love"
+                $AndroidPID = $(.\adb.exe shell pidof org.love2d.android)
+                .\adb.exe logcat --pid=$AndroidPID
+                returnfromlocal
+            }
+            finally
+            {
+                Write-Host "Ending debug session..."
+                .\adb.exe shell am force-stop org.love2d.android
+                returnfromlocal
+            }
         }
     }
 }
